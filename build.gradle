@@ -1,0 +1,76 @@
+plugins {
+    id 'java'
+    id 'com.google.cloud.tools.jib' version '3.3.0'
+
+    //used to download Prometheus JMX exporter jar, serves as replacement for custom base image including
+    id 'de.undercouch.download' version '5.1.2'
+}
+
+group 'net.christophschubert.kafka.streams.observe'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:all"
+        }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+ext {
+    jibExtraDirectory = "${buildDir}/jib-agents"
+    jmxPort = "7070" //should be a string for interpolation to work
+}
+dependencies {
+    implementation group: 'org.apache.kafka', name: 'kafka-streams', version: '3.2.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
+}
+
+// see https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin for sample config
+jib {
+    from {
+        image = 'docker.io/library/amazoncorretto:17.0.4'
+    }
+
+    to {
+        image = "kafka-word-count-app"
+    }
+
+
+    extraDirectories {
+        paths {
+            path {
+                from = "$jibExtraDirectory"
+                into = '/opt'
+            }
+            path {
+                from = 'prometheus'
+                into = '/opt'
+            }
+        }
+    }
+
+    container {
+        mainClass = 'net.christophschubert.kafka.streams.WordCountDemo'
+        jvmFlags = ['-javaagent:/opt/jmx_prometheus_javaagent.jar=${jmxPort}:/opt/kafka-streams.yaml']
+    }
+}
+
+task downloadAgent(type: Download) {
+    src 'https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.0/jmx_prometheus_javaagent-0.17.0.jar'
+    dest "${jibExtraDirectory}/jmx_prometheus_javaagent.jar"
+}
+
+tasks.jib.dependsOn downloadAgent
+tasks.jibDockerBuild.dependsOn downloadAgent
+tasks.jibBuildTar.dependsOn downloadAgent
