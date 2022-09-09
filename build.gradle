@@ -62,7 +62,7 @@ jib {
 
     container {
         mainClass = 'net.christophschubert.kafka.streams.WordCountDemo'
-        jvmFlags = ['-javaagent:/opt/jmx_prometheus_javaagent.jar=${jmxPort}:/opt/kafka-streams.yaml']
+        jvmFlags = ["-javaagent:/opt/jmx_prometheus_javaagent.jar=${jmxPort}:/opt/kafka-streams.yaml".toString()]
     }
 }
 
