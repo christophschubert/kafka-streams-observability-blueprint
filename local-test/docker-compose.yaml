@@ -27,7 +27,9 @@ services:
       - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: password
+    volumes:
+      - ${PWD}/grafana-provisioning:/etc/grafana/provisioning
     networks:
       - loki
   zookeeper:
@@ -35,7 +37,7 @@ services:
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: "2000"
+      ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SERVERS: zookeeper:2888:3888
   kafka:
     image: confluentinc/cp-kafka:7.2.1
