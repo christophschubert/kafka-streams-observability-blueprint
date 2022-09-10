@@ -3,7 +3,7 @@
 docker compose up -d
 
 echo "Waiting for broker to start up"
-sleep 20 # to prevent console producer to throw too many errors while Kafka is starting up
+sleep 20 # to prevent console producer throwing too many errors while Kafka is starting up
 
 kafka-console-producer --topic input --bootstrap-server localhost:9093 < sample-data
 
