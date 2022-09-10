@@ -55,8 +55,8 @@ services:
     depends_on:
       - kafka
     ports:
-      - "7778:7778"
-      - "7070:7070"
+      - "7070:7070" #JMX port
+      - "7171:7171" #health check port
     volumes:
       - log-volume:/logs
 
