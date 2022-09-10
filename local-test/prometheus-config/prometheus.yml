@@ -1,0 +1,10 @@
+global:
+  scrape_interval:     15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'word-count-app'
+    static_configs:
+      - targets: ['word-count-app:7070']

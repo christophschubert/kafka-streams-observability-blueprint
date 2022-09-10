@@ -14,6 +14,13 @@ services:
       - ${PWD}/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
 
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ${PWD}/prometheus-config:/etc/prometheus
+
   grafana:
     image: grafana/grafana:latest
     ports:
