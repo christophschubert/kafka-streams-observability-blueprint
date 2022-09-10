@@ -1,16 +1,11 @@
 version: "3"
 
-networks:
-  loki:
-
 services:
   loki:
     image: grafana/loki:2.6.1
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - loki
 
   promtail:
     image: grafana/promtail:2.6.1
@@ -18,8 +13,6 @@ services:
       - log-volume:/var/log
       - ${PWD}/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
-    networks:
-      - loki
 
   grafana:
     image: grafana/grafana:latest
@@ -30,8 +23,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: password
     volumes:
       - ${PWD}/grafana-provisioning:/etc/grafana/provisioning
-    networks:
-      - loki
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.2.1
     environment:
@@ -39,6 +31,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SERVERS: zookeeper:2888:3888
+
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     depends_on:
